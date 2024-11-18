@@ -277,6 +277,7 @@ html_template = """
 """
 
 # SocketIO Events
+
 @socketio.on('create_channel')
 def create_channel(data):
     conn = sqlite3.connect(DATABASE)
@@ -318,16 +319,18 @@ def add_reaction(data):
     conn.commit()
     emit('load_messages', get_messages(data['channel']), broadcast=True)
 
-# Helper functions
+
 def list_channels():
     conn = sqlite3.connect(DATABASE)
     cursor = conn.execute('SELECT name FROM channels')
     return [{'name': row[0]} for row in cursor.fetchall()]
 
+
 def get_messages(channel):
     conn = sqlite3.connect(DATABASE)
     cursor = conn.execute('SELECT sender, content, pinned, edited FROM messages WHERE channel = ? ORDER BY timestamp DESC', (channel,))
     return [{'sender': row[0], 'content': row[1], 'pinned': row[2], 'edited': row[3]} for row in cursor.fetchall()]
+
 
 if __name__ == '__main__':
     socketio.run(app, port=random.randint(5000, 6000))
